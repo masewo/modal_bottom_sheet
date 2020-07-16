@@ -19,6 +19,7 @@ Future<T> showMaterialModalBottomSheet<T>({
   bool isDismissible = true,
   bool enableDrag = true,
   Duration duration,
+  VoidCallback onClosing,
 }) async {
   assert(context != null);
   assert(builder != null);
@@ -48,6 +49,7 @@ Future<T> showMaterialModalBottomSheet<T>({
     enableDrag: enableDrag,
     animationCurve: animationCurve,
     duration: duration,
+    onClosing: onClosing,
   ));
   return result;
 }

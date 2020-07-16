@@ -85,6 +85,7 @@ Future<T> showCupertinoModalBottomSheet<T>({
   Duration duration,
   RouteSettings settings,
   Color transitionBackgroundColor,
+  VoidCallback onClosing,
 }) async {
   assert(context != null);
   assert(builder != null);
@@ -123,7 +124,8 @@ Future<T> showCupertinoModalBottomSheet<T>({
         previousRouteAnimationCurve: previousRouteAnimationCurve,
         duration: duration,
         settings: settings,
-        transitionBackgroundColor: transitionBackgroundColor ?? Colors.black),
+        transitionBackgroundColor: transitionBackgroundColor ?? Colors.black,
+        onClosing: onClosing),
   );
   return result;
 }
@@ -153,6 +155,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     Duration duration,
     RouteSettings settings,
     ScrollController scrollController,
+    VoidCallback onClosing,
     this.transitionBackgroundColor,
     this.topRadius = _default_top_radius,
     this.previousRouteAnimationCurve,
@@ -173,6 +176,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
           settings: settings,
           animationCurve: animationCurve,
           duration: duration,
+          onClosing: onClosing
         );
 
   @override

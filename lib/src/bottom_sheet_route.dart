@@ -90,6 +90,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
             animationController: widget.route._animationController,
             shouldClose: widget.route._hasScopedWillPopCallback
                 ? () async {
+                    widget.route?.onClosing();
                     final willPop = await widget.route.willPop();
                     return willPop != RoutePopDisposition.doNotPop;
                   }
@@ -125,6 +126,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
     this.bounce = false,
     this.animationCurve,
     this.duration,
+    this.onClosing,
     RouteSettings settings,
   })  : assert(expanded != null),
         assert(isDismissible != null),
@@ -141,6 +143,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
   final ScrollController scrollController;
 
   final Duration duration;
+  final VoidCallback onClosing;
 
   final AnimationController secondAnimationController;
   final Curve animationCurve;
