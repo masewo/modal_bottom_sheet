@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class WebFrame extends StatelessWidget {
   final Widget child;
@@ -134,14 +133,14 @@ class WebFrame extends StatelessWidget {
                               Row(
                                 children: <Widget>[
                                   InkWell(
-                                    onTap: () => launch(
+                                    onTap: () => print(
                                         'https://pub.dev/packages/modal_bottom_sheet'),
                                     child: Image.asset('assets/flutter.png',
                                         height: 60),
                                   ),
                                   Spacer(),
                                   InkWell(
-                                    onTap: () => launch(
+                                    onTap: () => print(
                                         'https://github.com/jamesblasco/modal_bottom_sheet'),
                                     child: Image.asset('assets/github.png',
                                         height: 60),
