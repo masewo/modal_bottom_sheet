@@ -17,6 +17,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
     this.scrollController,
     this.expanded = false,
     this.enableDrag = true,
+    this.enableDragNotifier,
     this.animationCurve,
   })  : assert(expanded != null),
         assert(enableDrag != null),
@@ -26,6 +27,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
   final bool expanded;
   final bool bounce;
   final bool enableDrag;
+  final ValueNotifier<bool> enableDragNotifier;
   final AnimationController secondAnimationController;
   final Curve animationCurve;
   final ScrollController scrollController;
@@ -105,6 +107,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
             bounce: widget.bounce,
             scrollController: widget.scrollController,
             animationCurve: widget.animationCurve,
+            enableDragNotifier: widget.enableDragNotifier,
           ),
         );
       },
@@ -122,6 +125,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
     this.modalBarrierColor,
     this.isDismissible = true,
     this.enableDrag = true,
+    this.enableDragNotifier,
     @required this.expanded,
     this.bounce = false,
     this.animationCurve,
@@ -140,6 +144,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
   final Color modalBarrierColor;
   final bool isDismissible;
   final bool enableDrag;
+  final ValueNotifier<bool> enableDragNotifier;
   final ScrollController scrollController;
 
   final Duration duration;
@@ -189,6 +194,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
         scrollController: scrollController,
         bounce: bounce,
         enableDrag: enableDrag,
+        enableDragNotifier: enableDragNotifier,
         animationCurve: animationCurve,
       ),
     );

@@ -18,6 +18,7 @@ Future<T> showMaterialModalBottomSheet<T>({
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
+  ValueNotifier<bool> enableDragNotifier,
   Duration duration,
   VoidCallback onClosing,
 }) async {
@@ -47,6 +48,7 @@ Future<T> showMaterialModalBottomSheet<T>({
     isDismissible: isDismissible,
     modalBarrierColor: barrierColor,
     enableDrag: enableDrag,
+    enableDragNotifier: enableDragNotifier,
     animationCurve: animationCurve,
     duration: duration,
     onClosing: onClosing,

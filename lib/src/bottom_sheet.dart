@@ -45,6 +45,7 @@ class ModalBottomSheet extends StatefulWidget {
     this.animationController,
     this.animationCurve,
     this.enableDrag = true,
+    this.enableDragNotifier,
     this.containerBuilder,
     this.bounce = true,
     this.shouldClose,
@@ -104,6 +105,8 @@ class ModalBottomSheet extends StatefulWidget {
   /// Default is true.
   final bool enableDrag;
 
+  final ValueNotifier<bool> enableDragNotifier;
+
   final ScrollController scrollController;
 
   @override
@@ -134,6 +137,8 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
   ScrollController _scrollController;
 
   AnimationController _bounceDragController;
+
+  bool enableDrag = true;
 
   double get _childHeight {
     final renderBox = _childKey.currentContext.findRenderObject() as RenderBox;
@@ -325,7 +330,23 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     _scrollController = widget.scrollController ?? ScrollController();
     // Todo: Check if we can remove scroll Controller
+    enableDrag = widget.enableDrag;
+    widget.enableDragNotifier?.addListener(updateEnableDrag);
     super.initState();
+  }
+
+  void updateEnableDrag() {
+    if (enableDrag != widget.enableDragNotifier.value) {
+      setState(() {
+        enableDrag = widget.enableDragNotifier.value;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.enableDragNotifier?.removeListener(updateEnableDrag);
+    super.dispose();
   }
 
   @override
@@ -364,12 +385,12 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
                   builder: (context, _) => CustomSingleChildLayout(
                     delegate: _CustomBottomSheetLayout(bounceAnimation.value),
                     child: GestureDetector(
-                      onVerticalDragUpdate: (details) {
+                      onVerticalDragUpdate: enableDrag ? (details) {
                         _handleDragUpdate(details.primaryDelta);
-                      },
-                      onVerticalDragEnd: (details) {
+                      } : null,
+                      onVerticalDragEnd: enableDrag ? (details) {
                         _handleDragEnd(details.primaryVelocity);
-                      },
+                      } : null,
                       child: NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification notification) {
                           _handleScrollUpdate(notification);
