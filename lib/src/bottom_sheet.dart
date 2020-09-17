@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -42,6 +41,7 @@ class ModalBottomSheet extends StatefulWidget {
   /// Creates a bottom sheet.
   const ModalBottomSheet({
     Key key,
+    this.closeProgressThreshold,
     this.animationController,
     this.animationCurve,
     this.enableDrag = true,
@@ -57,6 +57,10 @@ class ModalBottomSheet extends StatefulWidget {
         assert(onClosing != null),
         assert(builder != null),
         super(key: key);
+
+  /// The closeProgressThreshold parameter
+  /// specifies when the bottom sheet will be dismissed when user drags it.
+  final double closeProgressThreshold;
 
   /// The animation controller that controls the bottom sheet's entrance and
   /// exit animations.
@@ -157,7 +161,8 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
       widget.animationController.value < _willPopThreshold;
 
   bool get hasReachedCloseThreshold =>
-      widget.animationController.value < _closeProgressThreshold;
+      widget.animationController.value <
+      (widget.closeProgressThreshold ?? _closeProgressThreshold);
 
   void _close() {
     isDragging = false;
@@ -264,6 +269,8 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
   void _handleScrollUpdate(ScrollNotification notification) {
     //Check if scrollController is used
     if (!_scrollController.hasClients) return;
+    //Check if there is more than 1 attached ScrollController e.g. swiping page in PageView
+    if (_scrollController.positions.length > 1) return;
 
     final scrollPosition = _scrollController.position;
 
@@ -297,7 +304,8 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
 // Otherwise the calculate the velocity with a VelocityTracker
       if (_velocityTracker == null) {
-        _velocityTracker = VelocityTracker();
+        final pointerKind = defaultPointerDeviceKind(context);
+        _velocityTracker = VelocityTracker(pointerKind);
         _startTime = DateTime.now();
       }
       DragUpdateDetails dragDetails;
@@ -310,7 +318,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
       if (dragDetails != null) {
         final duration = _startTime.difference(DateTime.now());
         _velocityTracker.addPosition(duration, Offset(0, offset));
-        _handleDragUpdate(dragDetails.primaryDelta);
+        _handleDragUpdate(dragDetails.delta.dy);
       } else if (isDragging) {
         final velocity = _velocityTracker.getVelocity().pixelsPerSecond.dy;
         _velocityTracker = null;
@@ -386,7 +394,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
                     delegate: _CustomBottomSheetLayout(bounceAnimation.value),
                     child: GestureDetector(
                       onVerticalDragUpdate: enableDrag ? (details) {
-                        _handleDragUpdate(details.primaryDelta);
+                        _handleDragUpdate(details.delta.dy);
                       } : null,
                       onVerticalDragEnd: enableDrag ? (details) {
                         _handleDragEnd(details.primaryVelocity);
@@ -477,4 +485,24 @@ class _CustomBottomSheetLayout extends SingleChildLayoutDelegate {
     }
     return false;
   }
+}
+
+// Checks the device input type as per the OS installed in it
+// Mobile platforms will be default to `touch` while desktop will do to `mouse`
+// Used with VelocityTracker
+// https://github.com/flutter/flutter/pull/64267#issuecomment-694196304
+PointerDeviceKind defaultPointerDeviceKind(BuildContext context) {
+  final platform = Theme.of(context)?.platform ?? defaultTargetPlatform;
+  switch (platform) {
+    case TargetPlatform.iOS:
+    case TargetPlatform.android:
+      return PointerDeviceKind.touch;
+    case TargetPlatform.linux:
+    case TargetPlatform.macOS:
+    case TargetPlatform.windows:
+      return PointerDeviceKind.mouse;
+    case TargetPlatform.fuchsia:
+      return PointerDeviceKind.unknown;
+  }
+  return PointerDeviceKind.unknown;
 }
