@@ -6,10 +6,23 @@ import 'package:flutter/services.dart';
 import '../../modal_bottom_sheet.dart';
 import '../bottom_sheet_route.dart';
 
+const Radius _default_bar_top_radius = Radius.circular(15);
+
 class BarBottomSheet extends StatelessWidget {
   final Widget child;
+  final Widget control;
+  final Clip clipBehavior;
+  final double elevation;
+  final ShapeBorder shape;
 
-  const BarBottomSheet({Key key, this.child}) : super(key: key);
+  const BarBottomSheet(
+      {Key key,
+      this.child,
+      this.control,
+      this.clipBehavior,
+      this.shape,
+      this.elevation})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,34 +35,33 @@ class BarBottomSheet extends StatelessWidget {
             SizedBox(height: 12),
             SafeArea(
               bottom: false,
-              child: Container(
-                height: 6,
-                width: 40,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6)),
-              ),
+              child: control ??
+                  Container(
+                    height: 6,
+                    width: 40,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6)),
+                  ),
             ),
             SizedBox(height: 8),
             Flexible(
               flex: 1,
               fit: FlexFit.loose,
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15)),
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 10,
-                              color: Colors.black12,
-                              spreadRadius: 5)
-                        ]),
-                    width: double.infinity,
-                    child: MediaQuery.removePadding(
-                        context: context, removeTop: true, child: child)),
+              child: Material(
+                shape: shape ?? RoundedRectangleBorder(
+                  side: BorderSide(),
+                  borderRadius: BorderRadius.only(
+                      topLeft: _default_bar_top_radius,
+                      topRight: _default_bar_top_radius),
+                ),
+                clipBehavior: clipBehavior ?? Clip.hardEdge,
+                elevation: elevation ?? 2,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: MediaQuery.removePadding(
+                      context: context, removeTop: true, child: child),
+                ),
               ),
             ),
           ]),
@@ -63,6 +75,7 @@ Future<T> showBarModalBottomSheet<T>({
   Color backgroundColor,
   double elevation,
   ShapeBorder shape,
+  double closeProgressThreshold,
   Clip clipBehavior,
   Color barrierColor = Colors.black87,
   bool bounce = true,
@@ -72,6 +85,7 @@ Future<T> showBarModalBottomSheet<T>({
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
+  Widget topControl,
   Duration duration,
 }) async {
   assert(context != null);
@@ -86,8 +100,13 @@ Future<T> showBarModalBottomSheet<T>({
       .push(ModalBottomSheetRoute<T>(
     builder: builder,
     bounce: bounce,
+    closeProgressThreshold: closeProgressThreshold,
     containerBuilder: (_, __, child) => BarBottomSheet(
       child: child,
+      control: topControl,
+      clipBehavior: clipBehavior,
+      shape: shape,
+      elevation: elevation,
     ),
     secondAnimationController: secondAnimation,
     expanded: expand,
