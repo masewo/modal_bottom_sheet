@@ -67,7 +67,7 @@ class _CupertinoBottomSheetContainer extends StatelessWidget {
 
 Future<T> showCupertinoModalBottomSheet<T>({
   @required BuildContext context,
-  @required ScrollWidgetBuilder builder,
+  @required WidgetBuilder builder,
   Color backgroundColor,
   double elevation,
   double closeProgressThreshold,
@@ -143,7 +143,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
   final Color transitionBackgroundColor;
 
   CupertinoModalBottomSheetRoute({
-    ScrollWidgetBuilder builder,
+    WidgetBuilder builder,
     WidgetWithChildBuilder containerBuilder,
     double closeProgressThreshold,
     String barrierLabel,
@@ -329,8 +329,8 @@ class CupertinoScaffold extends StatefulWidget {
 
   static Future<T> showCupertinoModalBottomSheet<T>({
     @required BuildContext context,
-    @required ScrollWidgetBuilder builder,
     double closeProgressThreshold,
+    @required WidgetBuilder builder,
     Curve animationCurve,
     Curve previousRouteAnimationCurve,
     Color backgroundColor,
