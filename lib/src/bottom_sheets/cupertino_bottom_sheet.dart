@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart' show CupertinoTheme;
+import 'package:flutter/cupertino.dart' show CupertinoTheme, CupertinoApp;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
@@ -349,7 +349,8 @@ class CupertinoScaffold extends StatefulWidget {
     assert(useRootNavigator != null);
     assert(enableDrag != null);
     assert(debugCheckHasMediaQuery(context));
-    final isCupertinoApp = Theme.of(context, shadowThemeOnly: true) == null;
+    final isCupertinoApp =
+        context.findAncestorWidgetOfExactType<CupertinoApp>() != null;
     var barrierLabel = '';
     if (!isCupertinoApp) {
       assert(debugCheckHasMaterialLocalizations(context));
