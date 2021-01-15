@@ -348,9 +348,10 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
   }
 
   void updateEnableDrag() {
-    if (enableDrag != widget.enableDragNotifier?.value) {
+    if (widget.enableDragNotifier != null &&
+        enableDrag != widget.enableDragNotifier!.value) {
       setState(() {
-        enableDrag = widget.enableDragNotifier?.value;
+        enableDrag = widget.enableDragNotifier!.value;
       });
     }
   }
@@ -397,12 +398,16 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
                   builder: (context, _) => CustomSingleChildLayout(
                     delegate: _CustomBottomSheetLayout(bounceAnimation.value),
                     child: GestureDetector(
-                      onVerticalDragUpdate: enableDrag ? (details) {
-                        _handleDragUpdate(details.delta.dy);
-                      } : null,
-                      onVerticalDragEnd: enableDrag ? (details) {
-                        _handleDragEnd(details.primaryVelocity ?? 0);
-                      } : null,
+                      onVerticalDragUpdate: enableDrag
+                          ? (details) {
+                              _handleDragUpdate(details.delta.dy);
+                            }
+                          : null,
+                      onVerticalDragEnd: enableDrag
+                          ? (details) {
+                              _handleDragEnd(details.primaryVelocity ?? 0);
+                            }
+                          : null,
                       child: NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification notification) {
                           _handleScrollUpdate(notification);
