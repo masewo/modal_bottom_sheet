@@ -105,7 +105,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
                 animationController: widget.route._animationController!,
                 shouldClose: widget.route._hasScopedWillPopCallback
                     ? () async {
-                        widget.route?.onClosing?.call();
+                        widget.route.onClosing?.call();
                     final willPop = await widget.route.willPop();
                     return willPop != RoutePopDisposition.doNotPop;
                   }

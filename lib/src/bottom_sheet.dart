@@ -164,7 +164,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
   void _close() {
     isDragging = false;
-    widget.onClosing();
+    widget.onClosing?.call();
   }
 
   void _cancelClose() {
@@ -348,9 +348,9 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
   }
 
   void updateEnableDrag() {
-    if (enableDrag != widget.enableDragNotifier.value) {
+    if (enableDrag != widget.enableDragNotifier?.value) {
       setState(() {
-        enableDrag = widget.enableDragNotifier.value;
+        enableDrag = widget.enableDragNotifier?.value;
       });
     }
   }
