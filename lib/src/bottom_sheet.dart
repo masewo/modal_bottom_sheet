@@ -87,7 +87,7 @@ class ModalBottomSheet extends StatefulWidget {
   /// A bottom sheet might be prevented from closing (e.g., by user
   /// interaction) even after this callback is called. For this reason, this
   /// callback might be call multiple times for a given bottom sheet.
-  final Function() onClosing;
+  final Function()? onClosing;
 
   // If shouldClose is null is ignored.
   // If returns true => The dialog closes
@@ -106,7 +106,7 @@ class ModalBottomSheet extends StatefulWidget {
   /// Default is true.
   final bool enableDrag;
 
-  final ValueNotifier<bool> enableDragNotifier;
+  final ValueNotifier<bool>? enableDragNotifier;
 
   final ScrollController scrollController;
 

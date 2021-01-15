@@ -29,7 +29,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
   final bool expanded;
   final bool bounce;
   final bool enableDrag;
-  final ValueNotifier<bool> enableDragNotifier;
+  final ValueNotifier<bool>? enableDragNotifier;
   final AnimationController? secondAnimationController;
   final Curve? animationCurve;
 
@@ -162,11 +162,11 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
   final Color? modalBarrierColor;
   final bool isDismissible;
   final bool enableDrag;
-  final ValueNotifier<bool> enableDragNotifier;
+  final ValueNotifier<bool>? enableDragNotifier;
   final ScrollController? scrollController;
 
   final Duration? duration;
-  final VoidCallback onClosing;
+  final VoidCallback? onClosing;
 
   final AnimationController? secondAnimationController;
   final Curve? animationCurve;

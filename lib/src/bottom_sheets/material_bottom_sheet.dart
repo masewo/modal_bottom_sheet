@@ -19,9 +19,9 @@ Future<T?> showMaterialModalBottomSheet<T>({
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
-  ValueNotifier<bool> enableDragNotifier,
+  ValueNotifier<bool>? enableDragNotifier,
   Duration? duration,
-  VoidCallback onClosing,
+  VoidCallback? onClosing,
 }) async {
   assert(context != null);
   assert(builder != null);
