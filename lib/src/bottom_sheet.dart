@@ -37,27 +37,27 @@ typedef WidgetWithChildBuilder = Widget Function(
 class ModalBottomSheet extends StatefulWidget {
   /// Creates a bottom sheet.
   const ModalBottomSheet({
-    Key key,
+    Key? key,
     this.closeProgressThreshold,
-    this.animationController,
+    required this.animationController,
     this.animationCurve,
     this.enableDrag = true,
     this.enableDragNotifier,
     this.containerBuilder,
     this.bounce = true,
     this.shouldClose,
-    this.scrollController,
-    this.expanded,
-    @required this.onClosing,
-    @required this.child,
-  })  : assert(enableDrag != null),
+    required this.scrollController,
+    required this.expanded,
+    required this.onClosing,
+    required this.child,
+  })   : assert(enableDrag != null),
         assert(onClosing != null),
         assert(child != null),
         super(key: key);
 
   /// The closeProgressThreshold parameter
   /// specifies when the bottom sheet will be dismissed when user drags it.
-  final double closeProgressThreshold;
+  final double? closeProgressThreshold;
 
   /// The animation controller that controls the bottom sheet's entrance and
   /// exit animations.
@@ -69,7 +69,7 @@ class ModalBottomSheet extends StatefulWidget {
   /// The curve used by the animation showing and dismissing the bottom sheet.
   ///
   /// If no curve is provided it falls back to `decelerateEasing`.
-  final Curve animationCurve;
+  final Curve? animationCurve;
 
   /// Allows the bottom sheet to  go beyond the top bound of the content,
   /// but then bounce the content back to the edge of
@@ -80,7 +80,7 @@ class ModalBottomSheet extends StatefulWidget {
   // or if false it will fit to the content of the widget
   final bool expanded;
 
-  final WidgetWithChildBuilder containerBuilder;
+  final WidgetWithChildBuilder? containerBuilder;
 
   /// Called when the bottom sheet begins to close.
   ///
@@ -94,7 +94,7 @@ class ModalBottomSheet extends StatefulWidget {
   // If returns false => The dialog cancels close
   // Notice that if shouldClose is not null, the dialog will go back to the
   // previous position until the function is solved
-  final Future<bool> Function() shouldClose;
+  final Future<bool> Function()? shouldClose;
 
   /// A builder for the contents of the sheet.
   ///
@@ -121,7 +121,7 @@ class ModalBottomSheet extends StatefulWidget {
   /// animation controller could be provided.
   static AnimationController createAnimationController(
     TickerProvider vsync, {
-    Duration duration,
+    Duration? duration,
   }) {
     return AnimationController(
       duration: duration ?? _bottomSheetDuration,
@@ -137,12 +137,13 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
   ScrollController get _scrollController => widget.scrollController;
 
-  AnimationController _bounceDragController;
+  late AnimationController _bounceDragController;
 
   bool enableDrag = true;
 
-  double get _childHeight {
-    final renderBox = _childKey.currentContext.findRenderObject() as RenderBox;
+  double? get _childHeight {
+    final childContext = _childKey.currentContext;
+    final renderBox = childContext?.findRenderObject() as RenderBox;
     return renderBox.size.height;
   }
 
@@ -181,14 +182,14 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
   FutureOr<bool> shouldClose() async {
     if (_isCheckingShouldClose) return false;
-    if (widget.shouldClose == null) return null;
+    if (widget.shouldClose == null) return false;
     _isCheckingShouldClose = true;
-    final result = await widget.shouldClose();
+    final result = await widget.shouldClose?.call();
     _isCheckingShouldClose = false;
-    return result;
+    return result ?? false;
   }
 
-  ParametricCurve<double> animationCurve;
+  ParametricCurve<double> animationCurve = Curves.linear;
 
   void _handleDragUpdate(double primaryDelta) async {
     animationCurve = Curves.linear;
@@ -232,6 +233,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
     if (_dismissUnderway || !isDragging) return;
     isDragging = false;
+    // ignore: unawaited_futures
     _bounceDragController.reverse();
 
     var canClose = true;
@@ -245,6 +247,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
         _close();
       } else if (hasReachedCloseThreshold) {
         if (widget.animationController.value > 0.0) {
+          // ignore: unawaited_futures
           widget.animationController.fling(velocity: -1.0);
         }
         _close();
@@ -260,10 +263,11 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
   // we can not know the DragDownDetails and therefore the end velocity.
   // VelocityTracker it is used to calculate the end velocity  of the scroll
   // when user is trying to close the modal by dragging
-  VelocityTracker _velocityTracker;
-  DateTime _startTime;
+  VelocityTracker? _velocityTracker;
+  DateTime? _startTime;
 
   void _handleScrollUpdate(ScrollNotification notification) {
+    assert(notification.context != null);
     //Check if scrollController is used
     if (!_scrollController.hasClients) return;
     //Check if there is more than 1 attached ScrollController e.g. swiping page in PageView
@@ -271,7 +275,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
     if (_scrollController.positions.length > 1) return;
 
     if (_scrollController !=
-        Scrollable.of(notification.context).widget.controller) return;
+        Scrollable.of(notification.context!)!.widget.controller) return;
 
     final scrollPosition = _scrollController.position;
 
@@ -287,33 +291,41 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
       // while Bouncing Scroll Physics or other physics that Overflow don't return a drag end info
 
       // We use the velocity from DragEndDetail in case it is available
-      if (notification is ScrollEndNotification &&
-          notification.dragDetails != null) {
-        _handleDragEnd(notification.dragDetails.primaryVelocity);
-        _velocityTracker = null;
-        _startTime = null;
-        return;
+      if (notification is ScrollEndNotification) {
+        final dragDetails = notification.dragDetails;
+        if (dragDetails != null) {
+          _handleDragEnd(dragDetails.primaryVelocity ?? 0);
+          _velocityTracker = null;
+          _startTime = null;
+          return;
+        }
       }
 
       // Otherwise the calculate the velocity with a VelocityTracker
       if (_velocityTracker == null) {
         //final pointerKind = defaultPointerDeviceKind(context);
+        // ignore: deprecated_member_use
         _velocityTracker = VelocityTracker();
         _startTime = DateTime.now();
       }
-      DragUpdateDetails dragDetails;
+
+      DragUpdateDetails? dragDetails;
       if (notification is ScrollUpdateNotification) {
         dragDetails = notification.dragDetails;
       }
       if (notification is OverscrollNotification) {
         dragDetails = notification.dragDetails;
       }
+      assert(_velocityTracker != null);
+      assert(_startTime != null);
+      final startTime = _startTime!;
+      final velocityTracker = _velocityTracker!;
       if (dragDetails != null) {
-        final duration = _startTime.difference(DateTime.now());
-        _velocityTracker.addPosition(duration, Offset(0, offset));
+        final duration = startTime.difference(DateTime.now());
+        velocityTracker.addPosition(duration, Offset(0, offset));
         _handleDragUpdate(dragDetails.delta.dy);
       } else if (isDragging) {
-        final velocity = _velocityTracker.getVelocity().pixelsPerSecond.dy;
+        final velocity = velocityTracker.getVelocity().pixelsPerSecond.dy;
         _velocityTracker = null;
         _startTime = null;
         _handleDragEnd(velocity);
@@ -321,8 +333,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
     }
   }
 
-  ParametricCurve<double> get _defaultCurve =>
-      widget.animationCurve ?? _modalBottomSheetCurve;
+  Curve get _defaultCurve => widget.animationCurve ?? _modalBottomSheetCurve;
 
   @override
   void initState() {
@@ -359,7 +370,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
     var child = widget.child;
     if (widget.containerBuilder != null) {
-      child = widget.containerBuilder(
+      child = widget.containerBuilder!(
         context,
         widget.animationController,
         child,
@@ -370,7 +381,8 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
 
     child = AnimatedBuilder(
       animation: widget.animationController,
-      builder: (context, child) {
+      builder: (context, Widget? child) {
+        assert(child != null);
         final animationValue = animationCurve.transform(
             mediaQuery.accessibleNavigation
                 ? 1.0
@@ -389,14 +401,14 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
                         _handleDragUpdate(details.delta.dy);
                       } : null,
                       onVerticalDragEnd: enableDrag ? (details) {
-                        _handleDragEnd(details.primaryVelocity);
+                        _handleDragEnd(details.primaryVelocity ?? 0);
                       } : null,
                       child: NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification notification) {
                           _handleScrollUpdate(notification);
                           return false;
                         },
-                        child: child,
+                        child: child!,
                       ),
                     ),
                   ),
@@ -453,7 +465,7 @@ class _CustomBottomSheetLayout extends SingleChildLayoutDelegate {
   _CustomBottomSheetLayout(this.progress);
 
   final double progress;
-  double childHeight;
+  double? childHeight;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
@@ -486,7 +498,7 @@ class _CustomBottomSheetLayout extends SingleChildLayoutDelegate {
 // Used with VelocityTracker
 // https://github.com/flutter/flutter/pull/64267#issuecomment-694196304
 PointerDeviceKind defaultPointerDeviceKind(BuildContext context) {
-  final platform = Theme.of(context)?.platform ?? defaultTargetPlatform;
+  final platform = Theme.of(context).platform; // ?? defaultTargetPlatform;
   switch (platform) {
     case TargetPlatform.iOS:
     case TargetPlatform.android:
