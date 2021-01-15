@@ -39,6 +39,7 @@ class ModalBottomSheet extends StatefulWidget {
   const ModalBottomSheet({
     Key? key,
     this.closeProgressThreshold,
+    this.willPopThreshold,
     required this.animationController,
     this.animationCurve,
     this.enableDrag = true,
@@ -58,6 +59,10 @@ class ModalBottomSheet extends StatefulWidget {
   /// The closeProgressThreshold parameter
   /// specifies when the bottom sheet will be dismissed when user drags it.
   final double? closeProgressThreshold;
+
+  /// The willPopThreshold parameter
+  /// specifies when the bottom sheet will be calling onWillPop when user drags it.
+  final double? willPopThreshold;
 
   /// The animation controller that controls the bottom sheet's entrance and
   /// exit animations.
@@ -156,7 +161,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
   bool isDragging = false;
 
   bool get hasReachedWillPopThreshold =>
-      widget.animationController.value < _willPopThreshold;
+      widget.animationController.value < (widget.willPopThreshold ?? _willPopThreshold);
 
   bool get hasReachedCloseThreshold =>
       widget.animationController.value <

@@ -78,6 +78,7 @@ Future<T?> showCupertinoModalBottomSheet<T>({
   Color? backgroundColor,
   double? elevation,
   double? closeProgressThreshold,
+  double? willPopThreshold,
   ShapeBorder? shape,
   Clip? clipBehavior,
   Color? barrierColor,
@@ -123,6 +124,7 @@ Future<T?> showCupertinoModalBottomSheet<T>({
         secondAnimationController: secondAnimation,
         expanded: expand,
         closeProgressThreshold: closeProgressThreshold,
+        willPopThreshold: willPopThreshold,
         barrierLabel: barrierLabel,
         elevation: elevation,
         bounce: bounce,
@@ -159,6 +161,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     required WidgetBuilder builder,
     WidgetWithChildBuilder? containerBuilder,
     double? closeProgressThreshold,
+    double? willPopThreshold,
     String? barrierLabel,
     double? elevation,
     ShapeBorder? shape,
@@ -184,6 +187,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
         assert(enableDrag != null),
         super(
           closeProgressThreshold: closeProgressThreshold,
+          willPopThreshold: willPopThreshold,
           scrollController: scrollController,
           containerBuilder: containerBuilder,
           builder: builder,
@@ -349,6 +353,7 @@ class CupertinoScaffold extends StatefulWidget {
   static Future<T?> showCupertinoModalBottomSheet<T>({
     required BuildContext context,
     double? closeProgressThreshold,
+    double? willPopThreshold,
     required WidgetBuilder builder,
     Curve? animationCurve,
     Curve? previousRouteAnimationCurve,
@@ -380,6 +385,7 @@ class CupertinoScaffold extends StatefulWidget {
     final result = await Navigator.of(context, rootNavigator: useRootNavigator)
         .push(CupertinoModalBottomSheetRoute<T>(
       closeProgressThreshold: closeProgressThreshold,
+      willPopThreshold: willPopThreshold,
       builder: builder,
       secondAnimationController: CupertinoScaffold.of(context)!.animation,
       containerBuilder: (context, _, child) => _CupertinoBottomSheetContainer(

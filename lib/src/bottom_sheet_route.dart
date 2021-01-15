@@ -13,6 +13,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
   const _ModalBottomSheet({
     Key? key,
     this.closeProgressThreshold,
+    this.willPopThreshold,
     required this.route,
     this.secondAnimationController,
     this.bounce = false,
@@ -25,6 +26,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
         super(key: key);
 
   final double? closeProgressThreshold;
+  final double? willPopThreshold;
   final ModalBottomSheetRoute<T> route;
   final bool expanded;
   final bool bounce;
@@ -100,6 +102,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
               explicitChildNodes: true,
               child: ModalBottomSheet(
                 closeProgressThreshold: widget.closeProgressThreshold,
+                willPopThreshold: widget.willPopThreshold,
                 expanded: widget.route.expanded,
                 containerBuilder: widget.route.containerBuilder,
                 animationController: widget.route._animationController!,
@@ -134,6 +137,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
 class ModalBottomSheetRoute<T> extends PopupRoute<T> {
   ModalBottomSheetRoute({
     this.closeProgressThreshold,
+    this.willPopThreshold,
     this.containerBuilder,
     required this.builder,
     this.scrollController,
@@ -155,6 +159,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
         super(settings: settings);
 
   final double? closeProgressThreshold;
+  final double? willPopThreshold;
   final WidgetWithChildBuilder? containerBuilder;
   final WidgetBuilder builder;
   final bool expanded;
@@ -207,6 +212,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
       // removeTop: true,
       child: _ModalBottomSheet<T>(
         closeProgressThreshold: closeProgressThreshold,
+        willPopThreshold: willPopThreshold,
         route: this,
         secondAnimationController: secondAnimationController,
         expanded: expanded,

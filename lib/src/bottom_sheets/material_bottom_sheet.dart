@@ -6,6 +6,7 @@ import 'dart:async';
 Future<T?> showMaterialModalBottomSheet<T>({
   required BuildContext context,
   double? closeProgressThreshold,
+  double? willPopThreshold,
   required WidgetBuilder builder,
   Color? backgroundColor,
   double? elevation,
@@ -35,6 +36,7 @@ Future<T?> showMaterialModalBottomSheet<T>({
       .push(ModalBottomSheetRoute<T>(
     builder: builder,
     closeProgressThreshold: closeProgressThreshold,
+    willPopThreshold: willPopThreshold,
     containerBuilder: _materialContainerBuilder(
       context,
       backgroundColor: backgroundColor,
