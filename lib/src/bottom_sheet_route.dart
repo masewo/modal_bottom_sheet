@@ -1,9 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/src/utils/modal_scroll_controller.dart';
 
 import '../modal_bottom_sheet.dart';
 
@@ -21,9 +18,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
     this.enableDrag = true,
     this.enableDragNotifier,
     this.animationCurve,
-  })  : assert(expanded != null),
-        assert(enableDrag != null),
-        super(key: key);
+  })  : super(key: key);
 
   final double? closeProgressThreshold;
   final double? willPopThreshold;
@@ -153,10 +148,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
     this.duration,
     this.onClosing,
     RouteSettings? settings,
-  })  : assert(expanded != null),
-        assert(isDismissible != null),
-        assert(enableDrag != null),
-        super(settings: settings);
+  })  : super(settings: settings);
 
   final double? closeProgressThreshold;
   final double? willPopThreshold;
@@ -260,14 +252,8 @@ Future<T?> showCustomModalBottomSheet<T>({
   bool isDismissible = true,
   bool enableDrag = true,
   Duration? duration,
+  RouteSettings? settings,
 }) async {
-  assert(context != null);
-  assert(builder != null);
-  assert(containerWidget != null);
-  assert(expand != null);
-  assert(useRootNavigator != null);
-  assert(isDismissible != null);
-  assert(enableDrag != null);
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));
   final hasMaterialLocalizations =
@@ -290,6 +276,7 @@ Future<T?> showCustomModalBottomSheet<T>({
     enableDrag: enableDrag,
     animationCurve: animationCurve,
     duration: duration,
+    settings: settings,
   ));
   return result;
 }
