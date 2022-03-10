@@ -22,14 +22,9 @@ Future<T?> showMaterialModalBottomSheet<T>({
   bool enableDrag = true,
   ValueNotifier<bool>? enableDragNotifier,
   Duration? duration,
+  RouteSettings? settings,
   VoidCallback? onClosing,
 }) async {
-  assert(context != null);
-  assert(builder != null);
-  assert(expand != null);
-  assert(useRootNavigator != null);
-  assert(isDismissible != null);
-  assert(enableDrag != null);
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));
   final result = await Navigator.of(context, rootNavigator: useRootNavigator)
@@ -55,6 +50,7 @@ Future<T?> showMaterialModalBottomSheet<T>({
     enableDragNotifier: enableDragNotifier,
     animationCurve: animationCurve,
     duration: duration,
+    settings: settings,
     onClosing: onClosing,
   ));
   return result;
