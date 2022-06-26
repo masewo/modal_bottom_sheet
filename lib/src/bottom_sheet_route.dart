@@ -18,7 +18,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
     this.enableDrag = true,
     this.enableDragNotifier,
     this.animationCurve,
-  })  : super(key: key);
+  }) : super(key: key);
 
   final double? closeProgressThreshold;
   final double? willPopThreshold;
@@ -129,7 +129,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
   }
 }
 
-class ModalBottomSheetRoute<T> extends PopupRoute<T> {
+class ModalBottomSheetRoute<T> extends PageRoute<T> {
   ModalBottomSheetRoute({
     this.closeProgressThreshold,
     this.willPopThreshold,
@@ -148,7 +148,7 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
     this.duration,
     this.onClosing,
     RouteSettings? settings,
-  })  : super(settings: settings);
+  }) : super(settings: settings);
 
   final double? closeProgressThreshold;
   final double? willPopThreshold;
@@ -173,7 +173,13 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
 
   @override
   bool get barrierDismissible => isDismissible;
+  
+  @override
+  bool get maintainState => false; //idk but needed
 
+  @override
+  bool get opaque => false; //transparency
+  
   @override
   final String? barrierLabel;
 
