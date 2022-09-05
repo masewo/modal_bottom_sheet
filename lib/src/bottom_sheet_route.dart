@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import '../modal_bottom_sheet.dart';
 
 const Duration _bottomSheetDuration = Duration(milliseconds: 400);
+const double _willPopThreshold = 0.8;
 
 class _ModalBottomSheet<T> extends StatefulWidget {
   const _ModalBottomSheet({
     Key? key,
     this.closeProgressThreshold,
-    this.willPopThreshold,
+    this.willPopThreshold = _willPopThreshold,
     required this.route,
     this.secondAnimationController,
     this.bounce = false,
@@ -21,7 +22,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
   }) : super(key: key);
 
   final double? closeProgressThreshold;
-  final double? willPopThreshold;
+  final double willPopThreshold;
   final ModalBottomSheetRoute<T> route;
   final bool expanded;
   final bool bounce;
@@ -132,7 +133,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
 class ModalBottomSheetRoute<T> extends PageRoute<T> {
   ModalBottomSheetRoute({
     this.closeProgressThreshold,
-    this.willPopThreshold,
+    this.willPopThreshold = _willPopThreshold,
     this.containerBuilder,
     required this.builder,
     this.scrollController,
@@ -152,7 +153,7 @@ class ModalBottomSheetRoute<T> extends PageRoute<T> {
         super(settings: settings);
 
   final double? closeProgressThreshold;
-  final double? willPopThreshold;
+  final double willPopThreshold;
   final WidgetWithChildBuilder? containerBuilder;
   final WidgetBuilder builder;
   final bool expanded;

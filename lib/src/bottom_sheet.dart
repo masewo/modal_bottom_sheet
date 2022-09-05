@@ -56,10 +56,6 @@ class ModalBottomSheet extends StatefulWidget {
   /// specifies when the bottom sheet will be dismissed when user drags it.
   final double closeProgressThreshold;
 
-  /// The willPopThreshold parameter
-  /// specifies when the bottom sheet will be calling onWillPop when user drags it.
-  final double? willPopThreshold;
-
   /// The animation controller that controls the bottom sheet's entrance and
   /// exit animations.
   ///
@@ -165,7 +161,7 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
   bool isDragging = false;
 
   bool get hasReachedWillPopThreshold =>
-      widget.animationController.value < (widget.willPopThreshold ?? _willPopThreshold);
+      widget.animationController.value < widget.willPopThreshold;
 
   bool get hasReachedCloseThreshold =>
       widget.animationController.value < widget.closeProgressThreshold;

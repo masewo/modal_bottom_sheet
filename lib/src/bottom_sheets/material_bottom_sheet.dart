@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:async';
 
+const double _willPopThreshold = 0.8;
+
 /// Shows a modal material design bottom sheet.
 Future<T?> showMaterialModalBottomSheet<T>({
   required BuildContext context,
@@ -22,7 +24,7 @@ Future<T?> showMaterialModalBottomSheet<T>({
   Duration? duration,
   RouteSettings? settings,
   double? closeProgressThreshold,
-  double? willPopThreshold,
+  double willPopThreshold = _willPopThreshold,
   VoidCallback? onClosing,
 }) async {
   assert(debugCheckHasMediaQuery(context));

@@ -7,6 +7,7 @@ import '../../modal_bottom_sheet.dart';
 import '../bottom_sheet_route.dart';
 
 const Radius kDefaultBarTopRadius = Radius.circular(15);
+const double _willPopThreshold = 0.8;
 
 class BarBottomSheet extends StatelessWidget {
   final Widget child;
@@ -95,7 +96,7 @@ Future<T?> showBarModalBottomSheet<T>({
   RouteSettings? settings,
   SystemUiOverlayStyle? overlayStyle,
   double? closeProgressThreshold,
-  double? willPopThreshold,
+  double willPopThreshold = _willPopThreshold,
 }) async {
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));

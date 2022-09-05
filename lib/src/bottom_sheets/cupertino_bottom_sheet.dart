@@ -21,6 +21,7 @@ const double _kPreviousPageVisibleOffset = 10;
 const Radius _kDefaultTopRadius = Radius.circular(12);
 const BoxShadow _kDefaultBoxShadow =
     BoxShadow(blurRadius: 10, color: Colors.black12, spreadRadius: 5);
+const double _willPopThreshold = 0.8;
 
 /// Cupertino Bottom Sheet Container
 ///
@@ -94,7 +95,7 @@ Future<T?> showCupertinoModalBottomSheet<T>({
   BoxShadow? shadow,
   SystemUiOverlayStyle? overlayStyle,
   double? closeProgressThreshold,
-  double? willPopThreshold,
+  double willPopThreshold = _willPopThreshold,
 }) async {
   assert(debugCheckHasMediaQuery(context));
   final hasMaterialLocalizations =
@@ -155,7 +156,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     required WidgetBuilder builder,
     WidgetWithChildBuilder? containerBuilder,
     double? closeProgressThreshold,
-    double? willPopThreshold,
+    double willPopThreshold = _willPopThreshold,
     String? barrierLabel,
     double? elevation,
     ShapeBorder? shape,
@@ -343,7 +344,7 @@ class CupertinoScaffold extends StatefulWidget {
   static Future<T?> showCupertinoModalBottomSheet<T>({
     required BuildContext context,
     double? closeProgressThreshold,
-    double? willPopThreshold,
+    double willPopThreshold = _willPopThreshold,
     required WidgetBuilder builder,
     Curve? animationCurve,
     Curve? previousRouteAnimationCurve,
