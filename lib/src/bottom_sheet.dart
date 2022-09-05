@@ -10,7 +10,7 @@ import 'package:modal_bottom_sheet/src/utils/scroll_to_top_status_bar.dart';
 import 'package:modal_bottom_sheet/src/utils/bottom_sheet_suspended_curve.dart';
 
 const Curve _decelerateEasing = Cubic(0.0, 0.0, 0.2, 1.0);
-const Curve _modalBottomSheetCurve = _decelerateEasing;
+
 const Duration _bottomSheetDuration = Duration(milliseconds: 400);
 const double _minFlingVelocity = 500.0;
 const double _closeProgressThreshold = 0.6;
@@ -34,8 +34,6 @@ class ModalBottomSheet extends StatefulWidget {
   /// Creates a bottom sheet.
   const ModalBottomSheet({
     Key? key,
-    this.closeProgressThreshold,
-    this.willPopThreshold,
     required this.animationController,
     this.animationCurve,
     this.enableDrag = true,
@@ -47,11 +45,16 @@ class ModalBottomSheet extends StatefulWidget {
     required this.expanded,
     required this.onClosing,
     required this.child,
-  }) : super(key: key);
+    this.minFlingVelocity = _minFlingVelocity,
+    double? closeProgressThreshold,
+    this.willPopThreshold = _willPopThreshold,
+  })  : closeProgressThreshold =
+            closeProgressThreshold ?? _closeProgressThreshold,
+        super(key: key);
 
   /// The closeProgressThreshold parameter
   /// specifies when the bottom sheet will be dismissed when user drags it.
-  final double? closeProgressThreshold;
+  final double closeProgressThreshold;
 
   /// The willPopThreshold parameter
   /// specifies when the bottom sheet will be calling onWillPop when user drags it.
@@ -108,8 +111,16 @@ class ModalBottomSheet extends StatefulWidget {
 
   final ScrollController scrollController;
 
+  /// The minFlingVelocity parameter
+  /// Determines how fast the sheet should be flinged before closing.
+  final double minFlingVelocity;
+
+  /// The willPopThreshold parameter
+  /// Determines how far the sheet should be flinged before closing.
+  final double willPopThreshold;
+
   @override
-  _ModalBottomSheetState createState() => _ModalBottomSheetState();
+  ModalBottomSheetState createState() => ModalBottomSheetState();
 
   /// Creates an [AnimationController] suitable for a
   /// [ModalBottomSheet.animationController].
@@ -129,7 +140,7 @@ class ModalBottomSheet extends StatefulWidget {
   }
 }
 
-class _ModalBottomSheetState extends State<ModalBottomSheet>
+class ModalBottomSheetState extends State<ModalBottomSheet>
     with TickerProviderStateMixin {
   final GlobalKey _childKey = GlobalKey(debugLabel: 'BottomSheet child');
 
@@ -157,8 +168,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
       widget.animationController.value < (widget.willPopThreshold ?? _willPopThreshold);
 
   bool get hasReachedCloseThreshold =>
-      widget.animationController.value <
-      (widget.closeProgressThreshold ?? _closeProgressThreshold);
+      widget.animationController.value < widget.closeProgressThreshold;
 
   void _close() {
     isDragging = false;
@@ -247,7 +257,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
     }
 
     // If speed is bigger than _minFlingVelocity try to close it
-    if (velocity > _minFlingVelocity) {
+    if (velocity > widget.minFlingVelocity) {
       tryClose();
     } else if (hasReachedCloseThreshold) {
       if (widget.animationController.value > 0.0) {
@@ -271,14 +281,18 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
     assert(notification.context != null);
     //Check if scrollController is used
     if (!_scrollController.hasClients) return;
-    //Check if there is more than 1 attached ScrollController e.g. swiping page in PageView
+
+    ScrollPosition scrollPosition;
     // ignore: invalid_use_of_protected_member
-    if (_scrollController.positions.length > 1) return;
-
-    if (_scrollController !=
-        Scrollable.of(notification.context!)!.widget.controller) return;
-
-    final scrollPosition = _scrollController.position;
+    if (_scrollController.positions.length > 1) {
+      // ignore: invalid_use_of_protected_member
+      scrollPosition = _scrollController.positions
+          .firstWhere((p) => p.isScrollingNotifier.value,
+              // ignore: invalid_use_of_protected_member
+              orElse: () => _scrollController.positions.first);
+    } else {
+      scrollPosition = _scrollController.position;
+    }
 
     if (scrollPosition.axis == Axis.horizontal) return;
 
@@ -333,7 +347,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet>
     }
   }
 
-  Curve get _defaultCurve => widget.animationCurve ?? _modalBottomSheetCurve;
+  Curve get _defaultCurve => widget.animationCurve ?? _decelerateEasing;
 
   @override
   void initState() {

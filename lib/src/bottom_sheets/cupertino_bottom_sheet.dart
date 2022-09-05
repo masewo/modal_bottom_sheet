@@ -46,17 +46,17 @@ class _CupertinoBottomSheetContainer extends StatelessWidget {
     final topSafeAreaPadding = MediaQuery.of(context).padding.top;
     final topPadding = _kPreviousPageVisibleOffset + topSafeAreaPadding;
 
-    final _shadow = shadow ?? _kDefaultBoxShadow;
+    final shadow = this.shadow ?? _kDefaultBoxShadow;
     BoxShadow(blurRadius: 10, color: Colors.black12, spreadRadius: 5);
-    final _backgroundColor =
-        backgroundColor ?? CupertinoTheme.of(context).scaffoldBackgroundColor;
+    final backgroundColor = this.backgroundColor ??
+        CupertinoTheme.of(context).scaffoldBackgroundColor;
     return Padding(
       padding: EdgeInsets.only(top: topPadding),
       child: ClipRRect(
         borderRadius: BorderRadius.vertical(top: topRadius),
         child: Container(
           decoration:
-              BoxDecoration(color: _backgroundColor, boxShadow: [_shadow]),
+              BoxDecoration(color: backgroundColor, boxShadow: [shadow]),
           width: double.infinity,
           child: MediaQuery.removePadding(
             context: context,
@@ -74,8 +74,6 @@ Future<T?> showCupertinoModalBottomSheet<T>({
   required WidgetBuilder builder,
   Color? backgroundColor,
   double? elevation,
-  double? closeProgressThreshold,
-  double? willPopThreshold,
   ShapeBorder? shape,
   Clip? clipBehavior,
   Color? barrierColor,
@@ -95,6 +93,8 @@ Future<T?> showCupertinoModalBottomSheet<T>({
   Color? transitionBackgroundColor,
   BoxShadow? shadow,
   SystemUiOverlayStyle? overlayStyle,
+  double? closeProgressThreshold,
+  double? willPopThreshold,
 }) async {
   assert(debugCheckHasMediaQuery(context));
   final hasMaterialLocalizations =
@@ -223,10 +223,10 @@ class CupertinoModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
   }
 
   @override
-  Widget getPreviousRouteTransition(BuildContext context,
-      Animation<double> secondaryAnimation, Widget child) {
+  Widget getPreviousRouteTransition(
+      BuildContext context, Animation<double> secondAnimation, Widget child) {
     return _CupertinoModalTransition(
-      secondaryAnimation: secondaryAnimation,
+      secondaryAnimation: secondAnimation,
       body: child,
       animationCurve: previousRouteAnimationCurve,
       topRadius: topRadius,
@@ -302,20 +302,16 @@ class _CupertinoModalTransition extends StatelessWidget {
   }
 }
 
-class _CupertinoScaffold extends InheritedWidget {
+class CupertinoScaffoldInheirted extends InheritedWidget {
   final AnimationController? animation;
 
   final Radius? topRadius;
 
-  @override
-  final Widget child;
-
-  const _CupertinoScaffold({
-    Key? key,
+  const CupertinoScaffoldInheirted({
     this.animation,
-    required this.child,
+    required super.child,
     this.topRadius,
-  }) : super(key: key, child: child);
+  }) : super();
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
@@ -325,8 +321,8 @@ class _CupertinoScaffold extends InheritedWidget {
 
 // Support
 class CupertinoScaffold extends StatefulWidget {
-  static _CupertinoScaffold? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_CupertinoScaffold>();
+  static CupertinoScaffoldInheirted? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CupertinoScaffoldInheirted>();
 
   final Widget body;
   final Radius topRadius;
@@ -419,7 +415,7 @@ class _CupertinoScaffoldState extends State<CupertinoScaffold>
 
   @override
   Widget build(BuildContext context) {
-    return _CupertinoScaffold(
+    return CupertinoScaffoldInheirted(
       animation: animationController,
       topRadius: widget.topRadius,
       child: _CupertinoModalTransition(
