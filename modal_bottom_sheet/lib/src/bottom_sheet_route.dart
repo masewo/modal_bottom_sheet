@@ -104,8 +104,11 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
                 shouldClose: widget.route._hasScopedWillPopCallback
                     ? () async {
                         widget.route.onClosing?.call();
-                        final willPop = await widget.route.willPop();
-                        return willPop != RoutePopDisposition.doNotPop;
+                        return Future.delayed(
+                            Duration(milliseconds: 500),
+                            () =>
+                                widget.route.popDisposition !=
+                                RoutePopDisposition.doNotPop);
                       }
                     : null,
                 onClosing: () {
@@ -148,7 +151,7 @@ class ModalSheetRoute<T> extends PageRoute<T> {
     Duration? duration,
     this.onClosing,
     super.settings,
-  })  : duration = duration ?? _bottomSheetDuration;
+  }) : duration = duration ?? _bottomSheetDuration;
 
   final double? closeProgressThreshold;
   final double? willPopThreshold;
@@ -197,7 +200,8 @@ class ModalSheetRoute<T> extends PageRoute<T> {
     return _animationController!;
   }
 
-  bool get _hasScopedWillPopCallback => hasScopedWillPopCallback;
+  bool get _hasScopedWillPopCallback =>
+      popDisposition == RoutePopDisposition.doNotPop;
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
