@@ -88,11 +88,14 @@ Future<T?> showBarModalBottomSheet<T>({
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
+  ValueNotifier<bool>? enableDragNotifier,
   Widget? topControl,
   Duration? duration,
   RouteSettings? settings,
   SystemUiOverlayStyle? overlayStyle,
   double? closeProgressThreshold,
+  double? willPopThreshold,
+  VoidCallback? onClosing,
 }) async {
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));
@@ -101,6 +104,7 @@ Future<T?> showBarModalBottomSheet<T>({
     builder: builder,
     bounce: bounce,
     closeProgressThreshold: closeProgressThreshold,
+    willPopThreshold: willPopThreshold,
     containerBuilder: (_, __, child) => BarBottomSheet(
       child: child,
       control: topControl,
@@ -116,9 +120,11 @@ Future<T?> showBarModalBottomSheet<T>({
     isDismissible: isDismissible,
     modalBarrierColor: barrierColor,
     enableDrag: enableDrag,
+    enableDragNotifier: enableDragNotifier,
     animationCurve: animationCurve,
     duration: duration,
     settings: settings,
+    onClosing: onClosing,
   ));
   return result;
 }

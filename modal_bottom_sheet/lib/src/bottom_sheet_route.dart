@@ -10,19 +10,23 @@ class _ModalBottomSheet<T> extends StatefulWidget {
   const _ModalBottomSheet({
     super.key,
     this.closeProgressThreshold,
+    this.willPopThreshold,
     required this.route,
     this.secondAnimationController,
     this.bounce = false,
     this.expanded = false,
     this.enableDrag = true,
+    this.enableDragNotifier,
     this.animationCurve,
   });
 
   final double? closeProgressThreshold;
+  final double? willPopThreshold;
   final ModalSheetRoute<T> route;
   final bool expanded;
   final bool bounce;
   final bool enableDrag;
+  final ValueNotifier<bool>? enableDragNotifier;
   final AnimationController? secondAnimationController;
   final Curve? animationCurve;
 
@@ -93,11 +97,13 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
               explicitChildNodes: true,
               child: ModalBottomSheet(
                 closeProgressThreshold: widget.closeProgressThreshold,
+                willPopThreshold: widget.willPopThreshold,
                 expanded: widget.route.expanded,
                 containerBuilder: widget.route.containerBuilder,
                 animationController: widget.route._animationController!,
                 shouldClose: widget.route._hasScopedWillPopCallback
                     ? () async {
+                        widget.route.onClosing?.call();
                         final willPop = await widget.route.willPop();
                         return willPop != RoutePopDisposition.doNotPop;
                       }
@@ -109,6 +115,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
                 },
                 child: child!,
                 enableDrag: widget.enableDrag,
+                enableDragNotifier: widget.enableDragNotifier,
                 bounce: widget.bounce,
                 scrollController: scrollController,
                 animationCurve: widget.animationCurve,
@@ -125,6 +132,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
 class ModalSheetRoute<T> extends PageRoute<T> {
   ModalSheetRoute({
     this.closeProgressThreshold,
+    this.willPopThreshold,
     this.containerBuilder,
     required this.builder,
     this.scrollController,
@@ -133,14 +141,17 @@ class ModalSheetRoute<T> extends PageRoute<T> {
     this.modalBarrierColor,
     this.isDismissible = true,
     this.enableDrag = true,
+    this.enableDragNotifier,
     required this.expanded,
     this.bounce = false,
     this.animationCurve,
     Duration? duration,
+    this.onClosing,
     super.settings,
   })  : duration = duration ?? _bottomSheetDuration;
 
   final double? closeProgressThreshold;
+  final double? willPopThreshold;
   final WidgetWithChildBuilder? containerBuilder;
   final WidgetBuilder builder;
   final bool expanded;
@@ -148,10 +159,11 @@ class ModalSheetRoute<T> extends PageRoute<T> {
   final Color? modalBarrierColor;
   final bool isDismissible;
   final bool enableDrag;
+  final ValueNotifier<bool>? enableDragNotifier;
   final ScrollController? scrollController;
 
   final Duration duration;
-
+  final VoidCallback? onClosing;
   final AnimationController? secondAnimationController;
   final Curve? animationCurve;
 
@@ -197,11 +209,13 @@ class ModalSheetRoute<T> extends PageRoute<T> {
       // removeTop: true,
       child: _ModalBottomSheet<T>(
         closeProgressThreshold: closeProgressThreshold,
+        willPopThreshold: willPopThreshold,
         route: this,
         secondAnimationController: secondAnimationController,
         expanded: expanded,
         bounce: bounce,
         enableDrag: enableDrag,
+        enableDragNotifier: enableDragNotifier,
         animationCurve: animationCurve,
       ),
     );

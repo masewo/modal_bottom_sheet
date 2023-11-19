@@ -113,6 +113,8 @@ Future<T?> showCupertinoModalBottomSheet<T>({
   bool bounce = true,
   bool? isDismissible,
   bool enableDrag = true,
+  ValueNotifier<bool>? enableDragNotifier,
+  VoidCallback? onClosing,
   Radius topRadius = _kDefaultTopRadius,
   Duration? duration,
   RouteSettings? settings,
@@ -120,6 +122,7 @@ Future<T?> showCupertinoModalBottomSheet<T>({
   BoxShadow? shadow,
   SystemUiOverlayStyle? overlayStyle,
   double? closeProgressThreshold,
+  double? willPopThreshold,
 }) async {
   assert(debugCheckHasMediaQuery(context));
   final hasMaterialLocalizations =
@@ -142,6 +145,7 @@ Future<T?> showCupertinoModalBottomSheet<T>({
         secondAnimationController: secondAnimation,
         expanded: expand,
         closeProgressThreshold: closeProgressThreshold,
+        willPopThreshold: willPopThreshold,
         barrierLabel: barrierLabel,
         elevation: elevation,
         bounce: bounce,
@@ -150,12 +154,14 @@ Future<T?> showCupertinoModalBottomSheet<T>({
         isDismissible: isDismissible ?? expand == false ? true : false,
         modalBarrierColor: barrierColor ?? Colors.black12,
         enableDrag: enableDrag,
+        enableDragNotifier: enableDragNotifier,
         topRadius: topRadius,
         animationCurve: animationCurve,
         previousRouteAnimationCurve: previousRouteAnimationCurve,
         duration: duration,
         settings: settings,
         transitionBackgroundColor: transitionBackgroundColor ?? Colors.black,
+        onClosing: onClosing,
         overlayStyle: overlayStyle),
   );
   return result;
@@ -180,6 +186,7 @@ class CupertinoModalBottomSheetRoute<T> extends ModalSheetRoute<T> {
     required super.builder,
     super.containerBuilder,
     super.closeProgressThreshold,
+    super.willPopThreshold,
     super.barrierLabel,
     double? elevation,
     ShapeBorder? shape,
@@ -190,6 +197,8 @@ class CupertinoModalBottomSheetRoute<T> extends ModalSheetRoute<T> {
     super.bounce = true,
     super.isDismissible,
     super.enableDrag,
+    super.enableDragNotifier,
+    super.onClosing,
     required super.expanded,
     super.duration,
     super.settings,
@@ -427,6 +436,7 @@ class CupertinoScaffold extends StatefulWidget {
   static Future<T?> showCupertinoModalBottomSheet<T>({
     required BuildContext context,
     double? closeProgressThreshold,
+    double? willPopThreshold,
     required WidgetBuilder builder,
     Curve? animationCurve,
     Curve? previousRouteAnimationCurve,
@@ -437,9 +447,11 @@ class CupertinoScaffold extends StatefulWidget {
     bool bounce = true,
     bool? isDismissible,
     bool enableDrag = true,
+    ValueNotifier<bool>? enableDragNotifier,
     Duration? duration,
     RouteSettings? settings,
     BoxShadow? shadow,
+    Function()? onClosing,
     @Deprecated(
       'Will be ignored. OverlayStyle is computed from luminance of transitionBackgroundColor',
     )
@@ -460,6 +472,7 @@ class CupertinoScaffold extends StatefulWidget {
     final result = await Navigator.of(context, rootNavigator: useRootNavigator)
         .push(CupertinoModalBottomSheetRoute<T>(
       closeProgressThreshold: closeProgressThreshold,
+      willPopThreshold: willPopThreshold,
       builder: builder,
       secondAnimationController: CupertinoScaffold.of(context)!.animation,
       containerBuilder: (context, _, child) => _CupertinoBottomSheetContainer(
@@ -475,10 +488,12 @@ class CupertinoScaffold extends StatefulWidget {
       isDismissible: isDismissible ?? expand == false ? true : false,
       modalBarrierColor: barrierColor ?? Colors.black12,
       enableDrag: enableDrag,
+      enableDragNotifier: enableDragNotifier,
       topRadius: topRadius ?? _kDefaultTopRadius,
       animationCurve: animationCurve,
       previousRouteAnimationCurve: previousRouteAnimationCurve,
       duration: duration,
+      onClosing: onClosing,
       settings: settings,
     ));
     return result;

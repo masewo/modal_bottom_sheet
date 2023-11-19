@@ -37,18 +37,20 @@ class ModalBottomSheet extends StatefulWidget {
     required this.animationController,
     this.animationCurve,
     this.enableDrag = true,
+    this.enableDragNotifier,
     this.containerBuilder,
     this.bounce = true,
     this.shouldClose,
     required this.scrollController,
     required this.expanded,
-    required this.onClosing,
+    this.onClosing,
     required this.child,
     this.minFlingVelocity = _minFlingVelocity,
     double? closeProgressThreshold,
-    this.willPopThreshold = _willPopThreshold,
+    double? willPopThreshold,
   })  : closeProgressThreshold =
-            closeProgressThreshold ?? _closeProgressThreshold;
+            closeProgressThreshold ?? _closeProgressThreshold,
+        willPopThreshold = willPopThreshold ?? _willPopThreshold;
 
   /// The closeProgressThreshold parameter
   /// specifies when the bottom sheet will be dismissed when user drags it.
@@ -82,7 +84,7 @@ class ModalBottomSheet extends StatefulWidget {
   /// A bottom sheet might be prevented from closing (e.g., by user
   /// interaction) even after this callback is called. For this reason, this
   /// callback might be call multiple times for a given bottom sheet.
-  final Function() onClosing;
+  final Function()? onClosing;
 
   // If shouldClose is null is ignored.
   // If returns true => The dialog closes
@@ -100,6 +102,8 @@ class ModalBottomSheet extends StatefulWidget {
   ///
   /// Default is true.
   final bool enableDrag;
+
+  final ValueNotifier<bool>? enableDragNotifier;
 
   final ScrollController scrollController;
 
@@ -140,6 +144,8 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
 
   late AnimationController _bounceDragController;
 
+  bool enableDrag = true;
+
   double? get _childHeight {
     final childContext = _childKey.currentContext;
     final renderBox = childContext?.findRenderObject() as RenderBox;
@@ -155,14 +161,14 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
   bool isDragging = false;
 
   bool get hasReachedWillPopThreshold =>
-      widget.animationController.value < _willPopThreshold;
+      widget.animationController.value < widget.willPopThreshold;
 
   bool get hasReachedCloseThreshold =>
       widget.animationController.value < widget.closeProgressThreshold;
 
   void _close() {
     isDragging = false;
-    widget.onClosing();
+    widget.onClosing?.call();
   }
 
   void _cancelClose() {
@@ -339,14 +345,32 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
 
   Curve get _defaultCurve => widget.animationCurve ?? _decelerateEasing;
 
+  void updateEnableDrag() {
+    if (widget.enableDragNotifier != null &&
+        enableDrag != widget.enableDragNotifier!.value) {
+      setState(() {
+        enableDrag = widget.enableDragNotifier!.value;
+      });
+    }
+  }
+
   @override
   void initState() {
     animationCurve = _defaultCurve;
     _bounceDragController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
 
+    enableDrag = widget.enableDrag;
+    widget.enableDragNotifier?.addListener(updateEnableDrag);
+
     // Todo: Check if we can remove scroll Controller
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.enableDragNotifier?.removeListener(updateEnableDrag);
+    super.dispose();
   }
 
   @override
@@ -382,12 +406,16 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
                   builder: (context, _) => CustomSingleChildLayout(
                     delegate: _CustomBottomSheetLayout(bounceAnimation.value),
                     child: GestureDetector(
-                      onVerticalDragUpdate: (details) {
+                      onVerticalDragUpdate: enableDrag
+                          ? (details) {
                         _handleDragUpdate(details.delta.dy);
-                      },
-                      onVerticalDragEnd: (details) {
+                      }
+                          : null,
+                      onVerticalDragEnd: enableDrag
+                          ? (details) {
                         _handleDragEnd(details.primaryVelocity ?? 0);
-                      },
+                      }
+                          : null,
                       child: NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification notification) {
                           _handleScrollUpdate(notification);

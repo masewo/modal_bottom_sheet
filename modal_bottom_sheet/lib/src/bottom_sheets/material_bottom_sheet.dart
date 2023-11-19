@@ -19,9 +19,12 @@ Future<T?> showMaterialModalBottomSheet<T>({
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
+  ValueNotifier<bool>? enableDragNotifier,
   Duration? duration,
   RouteSettings? settings,
   double? closeProgressThreshold,
+  double? willPopThreshold,
+  VoidCallback? onClosing,
 }) async {
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));
@@ -29,6 +32,7 @@ Future<T?> showMaterialModalBottomSheet<T>({
       .push(ModalSheetRoute<T>(
     builder: builder,
     closeProgressThreshold: closeProgressThreshold,
+    willPopThreshold: willPopThreshold,
     containerBuilder: _materialContainerBuilder(
       context,
       backgroundColor: backgroundColor,
@@ -44,9 +48,11 @@ Future<T?> showMaterialModalBottomSheet<T>({
     isDismissible: isDismissible,
     modalBarrierColor: barrierColor,
     enableDrag: enableDrag,
+    enableDragNotifier: enableDragNotifier,
     animationCurve: animationCurve,
     duration: duration,
     settings: settings,
+    onClosing: onClosing,
   ));
   return result;
 }
